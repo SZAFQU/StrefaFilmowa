@@ -1,1 +1,0 @@
-<!DOCTYPE html><html><head><meta http-equiv='refresh' content='0;url=https://discord.gg/C4DudHqwn5'></head><body></body></html>
