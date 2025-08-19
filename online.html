@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Strefa Filmowa - Aktywne domeny</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root{
+      --bg: #000;
+      --text: #fff;
+      --accent: #e50914; /* czerwień */
+      --muted: rgba(255,255,255,.75);
+      --soft: rgba(255,255,255,.04);
+      --soft-2: rgba(255,255,255,.08);
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      height: 100%;
+      margin: 0;
+    }
+
+    body {
+      background:
+        radial-gradient(100% 60% at 50% 0%, rgba(229,9,20,.08), transparent 60%),
+        var(--bg);
+      color: var(--text);
+      font-family: 'Poppins', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+    }
+
+    main {
+      width: min(720px, 92vw);
+    }
+
+    h1 {
+      margin: 0 0 16px;
+      font-size: clamp(28px, 4vw, 42px);
+      font-weight: 700;
+      text-align: center;
+      letter-spacing: .2px;
+    }
+
+    h1 .accent {
+      color: var(--accent);
+    }
+
+    .container {
+      background: var(--soft);
+      border: 1px solid var(--soft-2);
+      border-radius: 16px;
+      box-shadow:
+        0 0 0 1px rgba(229,9,20,.25),
+        0 20px 50px rgba(229,9,20,.15),
+        inset 0 0 24px rgba(255,255,255,.03);
+      padding: 18px;
+    }
+
+    ul.list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px 12px;
+      border-radius: 12px;
+      background: rgba(255,255,255,.02);
+      border: 1px solid rgba(255,255,255,.08);
+      transition: transform .12s ease, border-color .2s ease, background .2s ease;
+    }
+
+    .item + .item { margin-top: 10px; }
+
+    .item:hover {
+      transform: translateY(-1px);
+      border-color: rgba(229,9,20,.6);
+      background: rgba(255,255,255,.04);
+    }
+
+    .item a {
+      color: var(--text);
+      text-decoration: none;
+      font-weight: 600;
+      letter-spacing: .2px;
+    }
+
+    .item a:focus-visible {
+      outline: 2px dashed var(--accent);
+      outline-offset: 3px;
+      border-radius: 6px;
+    }
+
+    .status {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.28);
+      background: transparent;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .status--ok {
+      background: #fff; /* białe tło dla OK */
+      color: #000;      /* czarny tekst */
+      border-color: #fff;
+    }
+
+    .status--bad {
+      color: #fff;
+      border-color: var(--accent);
+      box-shadow: inset 0 0 0 1px rgba(229,9,20,.5);
+    }
+
+    .status--loading { border-color: rgba(255,255,255,.28); }
+
+    .status--loading .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      border: 2px solid rgba(255,255,255,.2);
+      border-top-color: var(--accent);
+      display: inline-block;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(1turn); } }
+
+    .footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding-top: 12px;
+      margin-top: 14px;
+      border-top: 1px solid rgba(255,255,255,.08);
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .refresh {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 4px 16px rgba(229,9,20,.35);
+      transition: transform .12s ease, filter .2s ease, box-shadow .2s ease;
+    }
+
+    .refresh:hover {
+      filter: brightness(1.08);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 22px rgba(229,9,20,.5);
+    }
+
+    .refresh:active { transform: translateY(0); }
+
+    @media (prefers-reduced-motion: reduce) {
+      * { animation: none !important; transition: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1><span class="accent">Aktywne</span> domeny</h1>
+
+    <div class="container">
+      <ul id="domains" class="list" aria-live="polite"></ul>
+
+      <div class="footer">
+        <button id="refresh" class="refresh" type="button" aria-label="Odśwież listę">Odśwież</button>
+        <span id="updated">Zaktualizowano: —</span>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    // KONFIGURACJA: dodaj/usuń domeny tutaj
+    const domains = [
+      "strefafilmowa.byethost14.com",
+      "kreskowki24.top"
+    ];
+
+    function createItem(domain) {
+      const li = document.createElement("li");
+      li.className = "item";
+
+      const link = document.createElement("a");
+      link.href = `https://${domain}`;
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+      link.textContent = domain;
+
+      const status = document.createElement("span");
+      status.className = "status status--loading";
+      status.innerHTML = '<span class="dot"></span> Sprawdzam...';
+
+      li.appendChild(link);
+      li.appendChild(status);
+
+      return { li, status };
+    }
+
+    // Fallback ping obrazkiem (favicon), przydatny gdy HEAD zawiedzie
+    function imagePing(domain, timeoutMs = 6000) {
+      return new Promise((resolve) => {
+        const img = new Image();
+        let done = false;
+        const timer = setTimeout(() => { if (!done) { done = true; resolve(false); } }, timeoutMs);
+        const cleanup = () => { clearTimeout(timer); img.onload = img.onerror = null; };
+
+        img.onload = () => { if (done) return; done = true; cleanup(); resolve(true); };
+        img.onerror = () => { if (done) return; done = true; cleanup(); resolve(false); };
+        img.src = `https://${domain}/favicon.ico?ping=${Date.now()}`;
+      });
+    }
+
+    async function checkDomain(domain, timeoutMs = 6000) {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), timeoutMs);
+
+      try {
+        await fetch(`https://${domain}`, { method: "HEAD", mode: "no-cors", signal: controller.signal });
+        clearTimeout(timeout);
+        return true;
+      } catch (e) {
+        clearTimeout(timeout);
+        // fallback do obrazka
+        return await imagePing(domain, timeoutMs);
+      }
+    }
+
+    let runId = 0;
+
+    async function render() {
+      const current = ++runId;
+
+      const list = document.getElementById("domains");
+      list.innerHTML = "";
+
+      const rows = domains.map(d => createItem(d));
+      rows.forEach(({ li }) => list.appendChild(li));
+
+      const tasks = rows.map(async ({ status }, i) => {
+        const ok = await checkDomain(domains[i]);
+        if (runId !== current) return; // przerwane przez nowe odświeżenie
+
+        status.classList.remove("status--loading");
+        if (ok) {
+          status.classList.add("status--ok");
+          status.textContent = "Online";
+        } else {
+          status.classList.add("status--bad");
+          status.textContent = "Offline";
+        }
+      });
+
+      await Promise.allSettled(tasks);
+      document.getElementById("updated").textContent =
+        "Zaktualizowano: " + new Date().toLocaleString("pl-PL");
+    }
+
+    document.getElementById("refresh").addEventListener("click", render);
+
+    // start
+    render();
+  </script>
+</body>
+</html>
